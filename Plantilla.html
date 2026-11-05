@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Laboratorio de modelos · Clasificación municipal</title>
+    <style>
+      :root {
+        --ink: #172a36;
+        --muted: #75838a;
+        --line: #e4ebea;
+        --green: #176c5c;
+        --lime: #c7e776;
+        --bg: #f4f7f5;
+        --orange: #de795d;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          14px/1.5 system-ui,
+          -apple-system,
+          Segoe UI,
+          sans-serif;
+      }
+      button {
+        font: inherit;
+        cursor: pointer;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: 225px 1fr;
+        min-height: 100vh;
+      }
+      .side {
+        background: #163f39;
+        color: #fff;
+        padding: 30px 20px;
+        display: flex;
+        flex-direction: column;
+      }
+      .brand {
+        font-size: 18px;
+        font-weight: 760;
+        letter-spacing: -0.04em;
+      }
+      .brand span {
+        display: inline-grid;
+        place-items: center;
+        background: #c4e875;
+        color: #173e37;
+        border-radius: 8px;
+        width: 31px;
+        height: 31px;
+        margin-right: 8px;
+      }
+      .brand small {
+        display: block;
+        color: #a8c4bb;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        margin: 4px 0 42px 41px;
+        text-transform: uppercase;
+      }
+      .navlabel {
+        color: #87aaa0;
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        font-weight: 700;
+        margin: 0 10px 12px;
+      }
+      .nav a {
+        display: block;
+        text-decoration: none;
+        color: #c5d9d3;
+        padding: 11px 12px;
+        border-radius: 8px;
+        margin-bottom: 4px;
+      }
+      .nav a.active,
+      .nav a:hover {
+        background: #2b5a50;
+        color: white;
+      }
+      .foot {
+        margin-top: auto;
+        border-top: 1px solid #41685e;
+        padding-top: 20px;
+        color: #b4cdc4;
+        font-size: 12px;
+      }
+      .main {
+        padding: 29px 4.2% 50px;
+        min-width: 0;
+      }
+      .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+      }
+      .crumb {
+        font-size: 12px;
+        color: #8b999c;
+      }
+      .badge {
+        background: #e7efe5;
+        border: 1px solid #d4e3cf;
+        border-radius: 99px;
+        color: #4a7658;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 6px 11px;
+      }
+      .head {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        margin: 36px 0 23px;
+        gap: 20px;
+      }
+      .eyebrow {
+        color: #65877a;
+        text-transform: uppercase;
+        font-size: 10px;
+        letter-spacing: 0.17em;
+        font-weight: 800;
+      }
+      .head h1 {
+        font-size: 32px;
+        letter-spacing: -0.045em;
+        margin: 3px 0 4px;
+      }
+      .head p {
+        color: #83908f;
+        margin: 0;
+      }
+      .demo {
+        border: 1px solid #e8dcb8;
+        background: #fffaf0;
+        border-radius: 10px;
+        padding: 11px 15px;
+        color: #826f45;
+        font-size: 12px;
+        margin-bottom: 22px;
+      }
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+      }
+      .card,
+      .panel {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        box-shadow: 0 3px 14px #25473b05;
+      }
+      .card {
+        padding: 18px 19px;
+      }
+      .label {
+        font-size: 12px;
+        color: #83928e;
+      }
+      .value {
+        font-size: 27px;
+        letter-spacing: -0.04em;
+        font-weight: 750;
+        margin-top: 9px;
+      }
+      .sub {
+        color: #899693;
+        font-size: 11px;
+        margin-top: 4px;
+      }
+      .section-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 30px 0 13px;
+        gap: 15px;
+      }
+      .section-title h2 {
+        font-size: 16px;
+        margin: 0;
+        letter-spacing: -0.02em;
+      }
+      .section-title p,
+      .panel p {
+        color: #8b9995;
+        font-size: 11px;
+        margin: 3px 0 0;
+      }
+      .model-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+      }
+      .model {
+        border: 1px solid var(--line);
+        background: white;
+        text-align: left;
+        border-radius: 11px;
+        padding: 15px;
+        color: var(--ink);
+        transition: 0.15s;
+      }
+      .model:hover,
+      .model.selected {
+        border-color: #5da78e;
+        box-shadow: 0 0 0 2px #d7eee4;
+      }
+      .model .type {
+        font-size: 10px;
+        color: #82918c;
+        margin-top: 2px;
+      }
+      .model strong {
+        font-size: 14px;
+      }
+      .model .score {
+        margin-top: 15px;
+        font-size: 20px;
+        font-weight: 750;
+        letter-spacing: -0.04em;
+      }
+      .model .micro {
+        font-size: 10px;
+        color: #8b9995;
+      }
+      .dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #62b994;
+        margin-right: 6px;
+      }
+      .charts {
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        gap: 14px;
+      }
+      .panel {
+        padding: 21px;
+      }
+      .panel h3 {
+        font-size: 14px;
+        margin: 0;
+      }
+      .bars {
+        margin-top: 23px;
+      }
+      .barrow {
+        display: grid;
+        grid-template-columns: 83px 1fr 55px;
+        gap: 12px;
+        align-items: center;
+        margin: 14px 0;
+        font-size: 12px;
+      }
+      .barrow b {
+        text-align: right;
+        font-size: 12px;
+      }
+      .track {
+        height: 9px;
+        background: #edf3ef;
+        border-radius: 9px;
+        overflow: hidden;
+      }
+      .fill {
+        height: 100%;
+        background: #4d9b7d;
+        border-radius: 9px;
+      }
+      .fill.time {
+        background: #aecf76;
+      }
+      .legend {
+        font-size: 11px;
+        color: #8c9996;
+        margin-top: 17px;
+      }
+      .detail {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 14px;
+      }
+      .donutwrap {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        padding-top: 18px;
+      }
+      .donut {
+        width: 115px;
+        height: 115px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        position: relative;
+        flex: none;
+      }
+      .donut:before {
+        content: "";
+        position: absolute;
+        inset: 13px;
+        border-radius: 50%;
+        background: white;
+      }
+      .donut strong {
+        z-index: 1;
+        font-size: 21px;
+      }
+      .key {
+        display: grid;
+        gap: 8px;
+        color: #74817e;
+        font-size: 12px;
+      }
+      .key i {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 7px;
+      }
+      .tablebox {
+        overflow: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        margin-top: 12px;
+        white-space: nowrap;
+      }
+      th {
+        color: #9aa6a2;
+        font-weight: 600;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      td,
+      th {
+        padding: 11px 9px;
+        border-bottom: 1px solid #edf2ef;
+      }
+      td {
+        font-size: 12px;
+      }
+      td:first-child {
+        font-weight: 700;
+      }
+      .tag {
+        font-size: 10px;
+        color: #51826b;
+        background: #eff7ef;
+        padding: 4px 7px;
+        border-radius: 5px;
+      }
+      .notice {
+        font-size: 11px;
+        color: #91a09a;
+        margin-top: 23px;
+      }
+      .smallbutton {
+        background: white;
+        color: #58756c;
+        border: 1px solid #dce8df;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 11px;
+      }
+      .smallbutton:hover {
+        background: #eff7f1;
+      }
+      @media (max-width: 1100px) {
+        .model-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .metrics {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 760px) {
+        .layout {
+          display: block;
+        }
+        .side {
+          padding: 18px 20px;
+        }
+        .brand small,
+        .navlabel,
+        .foot {
+          display: none;
+        }
+        .nav {
+          display: flex;
+          overflow: auto;
+          margin-top: 15px;
+        }
+        .nav a {
+          white-space: nowrap;
+        }
+        .main {
+          padding: 22px 18px;
+        }
+        .head {
+          margin-top: 25px;
+          align-items: start;
+        }
+        .head h1 {
+          font-size: 25px;
+        }
+        .charts,
+        .detail {
+          grid-template-columns: 1fr;
+        }
+        .model-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .badge {
+          white-space: nowrap;
+        }
+        .barrow {
+          grid-template-columns: 70px 1fr 45px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="side">
+        <div class="brand">
+          <span>✳</span>Modelo a modelo<small>Laboratorio de decisión</small>
+        </div>
+        <div class="navlabel">EXPERIMENTO</div>
+        <nav class="nav">
+          <a class="active" href="#resumen">◫ &nbsp; Resumen general</a
+          ><a href="#modelos">◉ &nbsp; Modelos</a
+          ><a href="#comparativa">▥ &nbsp; Comparativa</a
+          ><a href="#resultados">☷ &nbsp; Resultados</a>
+        </nav>
+        <div class="foot">
+          CLASIFICACIÓN MUNICIPAL<br /><br />Una prueba de concepto para
+          comparar modelos de IA.
+        </div>
+      </aside>
+      <main class="main" id="resumen">
+        <div class="top">
+          <div class="crumb">
+            Experimentos &nbsp; / &nbsp; Clasificación de solicitudes
+          </div>
+          <div class="badge">● &nbsp; Vista de demostración</div>
+        </div>
+        <div class="head">
+          <div>
+            <div class="eyebrow">Inteligencia artificial aplicada</div>
+            <h1>Un mismo reto. Cinco modelos.</h1>
+            <p>
+              Clasificación de solicitudes ciudadanas por departamento
+              municipal.
+            </p>
+          </div>
+          <button class="smallbutton" onclick="window.print()">
+            ↗ &nbsp; Imprimir informe
+          </button>
+        </div>
+        <div class="demo">
+          <strong>Datos simulados.</strong> Esta página es una propuesta visual:
+          los resultados son ficticios y no hay modelos ni archivos conectados.
+        </div>
+        <div class="metrics">
+          <div class="card">
+            <div class="label">Solicitudes por modelo</div>
+            <div class="value">200</div>
+            <div class="sub">Mismo conjunto de evaluación</div>
+          </div>
+          <div class="card">
+            <div class="label">Modelos comparados</div>
+            <div class="value">5</div>
+            <div class="sub">Locales y en la nube</div>
+          </div>
+          <div class="card">
+            <div class="label">Mejor precisión simulada</div>
+            <div class="value">94,0 %</div>
+            <div class="sub">188 aciertos de 200</div>
+          </div>
+          <div class="card">
+            <div class="label">Menor latencia simulada</div>
+            <div class="value">0,18 s</div>
+            <div class="sub">Mediana por solicitud</div>
+          </div>
+        </div>
+        <div class="section-title" id="modelos">
+          <div>
+            <h2>Modelos participantes</h2>
+            <p>
+              Selecciona una tarjeta para consultar el detalle de cada modelo.
+            </p>
+          </div>
+          <span class="badge">DATOS DE EJEMPLO</span>
+        </div>
+        <div class="model-grid" id="models"></div>
+        <div class="section-title" id="comparativa">
+          <div>
+            <h2>La comparativa</h2>
+            <p>Una lectura conjunta de acierto y velocidad.</p>
+          </div>
+        </div>
+        <div class="charts">
+          <section class="panel">
+            <h3>Precisión por modelo</h3>
+            <p>
+              Porcentaje de solicitudes clasificadas correctamente · más es
+              mejor
+            </p>
+            <div class="bars" id="accuracy"></div>
+            <div class="legend">● Aciertos / solicitudes evaluadas × 100</div>
+          </section>
+          <section class="panel">
+            <h3>Tiempo por solicitud</h3>
+            <p>Mediana del tiempo de respuesta, en segundos · menos es mejor</p>
+            <div class="bars" id="latency"></div>
+            <div class="legend">
+              ● Incluye el tiempo de petición y respuesta en esta demostración.
+            </div>
+          </section>
+        </div>
+        <div class="section-title" id="resultados">
+          <div>
+            <h2>Resultados en detalle</h2>
+            <p>Desglose del modelo seleccionado y comparación completa.</p>
+          </div>
+        </div>
+        <div class="detail">
+          <section class="panel">
+            <h3 id="detailtitle"></h3>
+            <p>Distribución de resultados</p>
+            <div class="donutwrap">
+              <div class="donut" id="donut">
+                <strong id="donuttext"></strong>
+              </div>
+              <div class="key">
+                <div>
+                  <i style="background: #4b9a79"></i><span id="hits"></span>
+                </div>
+                <div>
+                  <i style="background: #e4937b"></i><span id="errors"></span>
+                </div>
+              </div>
+            </div>
+            <div class="notice">
+              En este ejemplo todas las solicitudes reciben respuesta; en una
+              prueba real se registrarían por separado los fallos técnicos.
+            </div>
+          </section>
+          <section class="panel tablebox">
+            <h3>Tabla comparativa</h3>
+            <p>Las cifras y nombres son ejemplos, no resultados medidos.</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Modelo</th>
+                  <th>Entorno</th>
+                  <th>Precisión</th>
+                  <th>Aciertos</th>
+                  <th>Errores</th>
+                  <th>Mediana</th>
+                  <th>Tiempo total</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </section>
+        </div>
+        <div class="notice">
+          Prototipo visual · Los tiempos totales de ejemplo incluyen el
+          procesamiento secuencial de las solicitudes. La mediana no determina
+          el tiempo total.
+        </div>
+      </main>
+    </div>
+    <script>
+      const data = [
+        {
+          name: "Laya",
+          env: "Local",
+          hits: 171,
+          errors: 29,
+          median: 0.18,
+          total: 40,
+        },
+        {
+          name: "Tev1",
+          env: "Local",
+          hits: 181,
+          errors: 19,
+          median: 0.35,
+          total: 79,
+        },
+        {
+          name: "Nimble",
+          env: "Local",
+          hits: 186,
+          errors: 14,
+          median: 0.62,
+          total: 139,
+        },
+        {
+          name: "Jev",
+          env: "Nube",
+          hits: 188,
+          errors: 12,
+          median: 0.74,
+          total: 166,
+        },
+        {
+          name: "Qwen",
+          env: "Local",
+          hits: 183,
+          errors: 17,
+          median: 1.45,
+          total: 315,
+        },
+      ];
+      let selected = 0;
+      const pct = (d) => (d.hits / (d.hits + d.errors)) * 100;
+      const n = (x) => x.toFixed(1).replace(".", ",");
+      const sec = (x) => x.toFixed(2).replace(".", ",") + " s";
+      function render() {
+        document.querySelector("#models").innerHTML = data
+          .map(
+            (d, i) =>
+              `<button class="model ${i === selected ? "selected" : ""}" aria-pressed="${i === selected}" onclick="selectModel(${i})"><strong><span class="dot"></span>${d.name}</strong><div class="type">${d.env} · ${d.name === "Qwen" ? "General" : "Decisión"}</div><div class="score">${n(pct(d))} %</div><div class="micro">Precisión simulada</div></button>`,
+          )
+          .join("");
+        document.querySelector("#accuracy").innerHTML = data
+          .map(
+            (d) =>
+              `<div class="barrow"><span>${d.name}</span><div class="track"><div class="fill" style="width:${pct(d)}%"></div></div><b>${n(pct(d))} %</b></div>`,
+          )
+          .join("");
+        let max = Math.max(...data.map((d) => d.median));
+        document.querySelector("#latency").innerHTML = data
+          .map(
+            (d) =>
+              `<div class="barrow"><span>${d.name}</span><div class="track"><div class="fill time" style="width:${(d.median / max) * 100}%"></div></div><b>${sec(d.median)}</b></div>`,
+          )
+          .join("");
+        let d = data[selected];
+        document.querySelector("#detailtitle").textContent =
+          d.name + " · " + d.env;
+        document.querySelector("#donut").style.background =
+          `conic-gradient(#4b9a79 0 ${pct(d)}%,#e4937b ${pct(d)}% 100%)`;
+        document.querySelector("#donuttext").textContent = n(pct(d)) + " %";
+        document.querySelector("#hits").textContent = d.hits + " aciertos";
+        document.querySelector("#errors").textContent = d.errors + " errores";
+        document.querySelector("#tbody").innerHTML = data
+          .map(
+            (x) =>
+              `<tr><td>${x.name}</td><td><span class="tag">${x.env}</span></td><td>${n(pct(x))} %</td><td>${x.hits}</td><td>${x.errors}</td><td>${sec(x.median)}</td><td>${x.total} s</td></tr>`,
+          )
+          .join("");
+      }
+      function selectModel(i) {
+        selected = i;
+        render();
+      }
+      render();
+    </script>
+  </body>
+</html>

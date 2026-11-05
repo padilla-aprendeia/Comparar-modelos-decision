@@ -1,0 +1,299 @@
+﻿<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Modelo a modelo · Laboratorio municipal</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <aside>
+        <div class="brand">
+          <span>✳</span> Modelo a modelo<small>LABORATORIO DE DECISIÓN</small>
+        </div>
+        <div class="navlabel">EXPERIMENTO</div>
+        <nav>
+          <a href="#config">◫ &nbsp; Preparar prueba</a
+          ><a href="#catalogo">▤ &nbsp; Departamentos</a
+          ><a href="#resultados">◉ &nbsp; Resultados</a
+          ><a href="#historial">◷ &nbsp; Historial</a>
+        </nav>
+        <p class="asidefoot">
+          CLASIFICACIÓN MUNICIPAL<br /><br />Un laboratorio para comparar
+          decisiones de IA.
+        </p>
+      </aside>
+      <main>
+
+        <header>
+          <div class="eyebrow">INTELIGENCIA ARTIFICIAL APLICADA</div><h1>Comparador de modelos <em>de decisión.</em></h1>
+
+        </header>
+        <div class="notice">
+          <strong>Experimento con datos sintéticos.</strong> Los resultados no
+          demuestran que el sistema sea apto para tramitar solicitudes reales
+          sin supervisión.
+        </div>
+        <div id="alert" role="alert" hidden></div>
+        <section id="config">
+          <div class="section-title">
+
+          </div>
+          <details class="panel schema-panel" id="schema-panel">
+            <summary>Esquema de preguntas · Ver y editar JSON</summary>
+            <p>Se envían estas preguntas a los modelos de decisión. Para el LLM se traducen a instrucciones y salida estructurada equivalentes. El texto de cada solicitud se incorpora automáticamente; no se incluyen ID, respuesta esperada ni dificultad.</p>
+            <label for="schema-editor">Esquema de preguntas (JSON)</label>
+            <textarea id="schema-editor" spellcheck="false" rows="15" aria-describedby="schema-help"></textarea>
+            <div class="schema-actions"><button class="secondary" id="sync-schema" type="button">Actualizar criterios desde el catálogo</button><button class="secondary" id="reset-schema" type="button">Restaurar preguntas iniciales</button></div>
+            <p id="schema-help">Edita las instrucciones, descripciones y entre 2 y 10 niveles de claridad. Conserva los nombres y tipos de las preguntas. Los códigos deben coincidir con el catálogo; al actualizar sus criterios se reemplazan las descripciones editadas en este cuadro.</p>
+          </details>
+          <div class="grid two">
+            <div class="panel">
+              <h3>Conexión y modelos</h3> <span class="badge" id="connection">Comprobando Ollama…</span>
+ 
+              <label>Dirección de Ollama</label>
+              <div class="inline">
+                <input id="url" value="http://127.0.0.1:11434" /><button
+                  class="secondary"
+                  id="refresh"
+                >
+                  ↻ Actualizar
+                </button>
+              </div>
+              <div id="model-status" class="status"></div>
+              <h4>Modelos de decisión instalados</h4>
+              <div id="decisions"></div>
+              <label for="extra-decision"
+                >Otro modelo local para probar como decisi&#243;n</label
+              ><select id="extra-decision">
+                <option value="">Ninguno</option>
+              </select>
+              <p>
+                Para modelos sin la capacidad <code>decision</code>. La
+                compatibilidad se verificar&#225; durante la ejecuci&#243;n.
+              </p>
+              <label for="llm">Modelo de lenguaje general <span class="optional">OPCIONAL</span></label
+              ><select id="llm">
+                <option value="">No utilizar LLM</option>
+              </select>
+              <p id="llm-hint">
+                Puedes ejecutar solamente modelos de decisi&#243;n.
+              </p>
+              <div class="cloud">
+                <label class="check"
+                  ><input id="jev" type="checkbox" /> Incluir Jev · TypeSafe AI
+                  <b>EN LA NUBE</b></label
+                >
+                <p id="jev-info"></p>
+                <p>
+                  Al seleccionarlo se enviarán las solicitudes y el
+                  catálogo a TypeSafe; puede generar costes. La clave se lee del
+                  archivo .env.
+                </p>
+              </div>
+            </div>
+            <div class="panel">
+              <h3>Conjunto de solicitudes</h3>
+              <p>
+                Archivo Excel o CSV con ID, Solicitud, Departamento esperado y
+                Dificultad.
+              </p>
+              <label class="drop"
+                >↥ <strong>Seleccionar archivo</strong><span> .xlsx o .csv</span
+                ><input type="file" id="file" accept=".xlsx,.csv"
+              /></label>
+              <div id="file-status" class="status">
+                Todavía no has cargado solicitudes.
+              </div>
+              <div class="params">
+                <label
+                  >Repeticiones<input
+                    id="repetitions"
+                    type="number"
+                    value="1"
+                    min="1"
+                    max="100" /></label
+                ><label
+                  >Reintentos técnicos<input
+                    id="retries"
+                    type="number"
+                    value="0"
+                    min="0"
+                    max="3" /></label
+                ><label
+                  >Espera máxima (s)<input
+                    id="timeout"
+                    type="number"
+                    value="120"
+                    min="1"
+                    max="3600" /></label
+                ><label
+                  >Temperatura LLM<input
+                    id="temperature"
+                    type="number"
+                    value="0"
+                    min="0"
+                    max="2"
+                    step="0.1" /></label
+                ><label
+                  >Semilla LLM<input
+                    id="seed"
+                    type="number"
+                    value="42" /></label
+                >
+              </div>
+              <p>Los modelos locales se precargan, se verifican y se descargan uno a uno. Los tiempos de carga se muestran por separado. Evita usar Ollama desde otras aplicaciones durante la prueba.</p>
+              <div class="actions">
+                <button id="start">Iniciar experimento ↗</button
+                ><button class="secondary" id="cancel" disabled>
+                  Cancelar
+                </button>
+              </div>
+              <div id="progress" class="status"></div>
+              <progress id="progressbar" value="0" max="1"></progress>
+            </div>
+          </div>
+          <div class="section-title dashboard-title"><div><span class="step">COMPARATIVA EN DIRECTO</span><h2>La comparativa</h2><p>Resultados de la ejecución actual o de la última consultada en el historial.</p></div></div>
+          <div class="dashboard-grid">
+            <div class="panel dashboard-panel">
+              <h3>Precisión por modelo</h3>
+              <p>Aciertos sobre respuestas válidas · más es mejor.</p>
+              <div id="dashboard-accuracy" class="dashboard-content"><p>Los resultados aparecerán cuando se procese una solicitud.</p></div>
+            </div>
+            <div class="panel dashboard-panel">
+              <h3>Tiempo por solicitud</h3>
+              <p>Mediana en segundos de las mediciones incluidas · menos es mejor.</p>
+              <div id="dashboard-time" class="dashboard-content"><p>Todavía no hay tiempos medidos.</p></div>
+            </div>
+          </div>
+          <div class="section-title dashboard-title"><div><span class="step">DESGLOSE</span><h2>Resultados en detalle</h2><p>Distribución del modelo seleccionado y comparación completa.</p></div></div>
+          <div class="dashboard-grid">
+            <div class="panel dashboard-panel">
+              <h3>Distribución de resultados</h3>
+              <label for="dashboard-model">Modelo</label><select id="dashboard-model" disabled><option>Sin resultados</option></select>
+              <div id="dashboard-distribution" class="dashboard-content"><p>Sin solicitudes procesadas.</p></div>
+            </div>
+            <div class="panel dashboard-panel tablebox">
+              <h3>Tabla comparativa</h3>
+              <p>Precisión sobre respuestas válidas. Tiempo total: suma de peticiones medidas, sin carga ni descarga.</p>
+              <table><thead><tr><th>Modelo</th><th>Entorno</th><th>Precisión</th><th>Aciertos</th><th>Errores</th><th>Inválidas / fallos</th><th>Mediana</th><th>Tiempo total</th></tr></thead><tbody id="dashboard-table"><tr><td colspan="8">Sin resultados todavía.</td></tr></tbody></table>
+            </div>
+          </div>
+        </section>
+        <section id="catalogo" hidden>
+          <div class="section-title">
+            <div>
+              <span class="step">02 / CRITERIOS</span>
+              <h2>Departamentos municipales</h2>
+              <p>
+                Edita los criterios antes de cargar el archivo. Los cambios
+                invalidan la carga anterior.
+              </p>
+            </div>
+            <button id="add" class="secondary">+ Añadir</button>
+          </div>
+          <details class="panel catalog-panel">
+            <summary>Mostrar departamentos y criterios</summary>
+            <div class="tablebox">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Código exacto</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="catalog"></tbody>
+              </table>
+              <details>
+                <summary>Instrucci&#243;n inicial (editable en el esquema)</summary>
+                <p id="instruction"></p>
+              </details>
+            </div>
+          </details>
+        </section>
+        <section id="resultados" hidden>
+          <div class="section-title">
+            <div>
+              <span class="step">03 / ANÁLISIS</span>
+              <h2>Resultados del experimento</h2>
+              <p>
+                Los indicadores aparecen cuando una ejecución tiene resultados.
+              </p>
+            </div>
+            <a class="button secondary" id="export-config" hidden
+              >Configuraci&#243;n JSON</a
+            ><a class="button secondary" id="export" hidden>↓ Exportar CSV</a>
+          </div>
+          <div id="empty" class="panel empty">
+            <div class="empty-icon">◫</div>
+            <h3>Tu comparativa empieza aquí</h3>
+            <p>
+              Configura los modelos y carga un conjunto de solicitudes para ver
+              los resultados reales.
+            </p>
+          </div>
+          <div id="results" hidden>
+            <div id="metrics" class="metrics"></div>
+            <div class="grid two results-panels">
+              <div class="panel">
+                <h3>Precisión por modelo</h3>
+                <p>
+                  Aciertos sobre respuestas válidas. La barra no incluye fallos
+                  técnicos ni respuestas inválidas.
+                </p>
+                <div id="bars"></div>
+              </div>
+              <div class="panel">
+                <h3>Detalle por modelo</h3>
+                <select id="model-detail"></select>
+                <div id="detail"></div>
+              </div>
+            </div>
+            <div class="panel tablebox">
+              <h3>Solicitudes procesadas</h3>
+              <p>
+                Incluye respuestas inválidas y fallos técnicos. Selecciona un
+                modelo para filtrar.
+              </p>
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID / solicitud</th>
+                    <th>Modelo</th>
+                    <th>Rep.</th>
+                    <th>Esperado</th>
+                    <th>Obtenido</th>
+                    <th>Resultado</th>
+                    <th>Tiempo</th>
+                    <th>Claridad</th>
+                    <th>Error</th>
+                  </tr>
+                </thead>
+                <tbody id="rows"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section id="historial" hidden>
+          <div class="section-title">
+            <div>
+              <span class="step">04 / ARCHIVO</span>
+              <h2>Ejecuciones guardadas</h2>
+              <p>Recupera una prueba anterior y su configuración original.</p>
+            </div>
+            <button id="reload-runs" class="secondary">↻ Actualizar</button>
+          </div>
+          <div class="panel" id="runs">Sin ejecuciones guardadas.</div>
+        </section>
+        <footer>
+          Laboratorio local · Los tiempos incluyen la petición completa y sus
+          reintentos.
+        </footer>
+      </main>
+    </div>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
