@@ -18,6 +18,8 @@ Al abrir la aplicación, esta consulta la instancia local de Ollama de cada usua
 
 Necesitas Python 3.11 o posterior (se ha probado con Python 3.14), Ollama instalado y, para ejecutar una prueba, modelos ya registrados en Ollama. Abre PowerShell en esta carpeta y ejecuta:
 
+![Texto alternativo](Screenshot.jpg)
+
 ```powershell
 py -3.14 -m venv .venv
 .\.venv\Scripts\python -m pip install -r requirements.txt
