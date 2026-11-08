@@ -1,12 +1,12 @@
-﻿# Modelo a modelo · Laboratorio municipal
+﻿# Comparador de modelos de decisión
 
-Aplicación local para comparar modelos de decisión y modelos de lenguaje al clasificar solicitudes **sintéticas** de un ayuntamiento ficticio. Es un experimento, no una prueba de aptitud para tramitar solicitudes reales sin supervisión. La interfaz toma como referencia `Plantilla.html`; no utiliza sus resultados simulados.
+Aplicación en python para comparar modelos de decisión (sistema uno) entre sí y con LLM. Se ut al clasificar solicitudes **sintéticas** de un ayuntamiento ficticio. Es un experimento, no una prueba de aptitud para tramitar solicitudes reales sin supervisión.
 
 ## Distribución
 
 El repositorio contiene únicamente el código, los datos de ejemplo y las dependencias: **no contiene ni descarga modelos de Ollama, resultados previos ni credenciales**. Por tanto, se puede compartir por GitHub sin obligar a nadie a descargar los modelos que use quien lo publica.
 
-Cada persona que clone el repositorio necesita:
+Requerimientos:
 
 - Windows 11, Python 3.11 o posterior y Ollama instalados.
 - Ollama en ejecución en su equipo.
